@@ -1,5 +1,8 @@
 import aiohttp
 import asyncio
+import keyboard
+
+cur = []
 
 async def sendNum(number, url, payload):
     async with aiohttp.ClientSession() as session:
@@ -12,12 +15,25 @@ async def sendNum(number, url, payload):
         except aiohttp.ClientError as e:
             print(f"Error sending number {number} to Machine A: {e}")
 
-async def main():
+def on_key_event(event):
+    if event.event_type == keyboard.KEY_DOWN:
+        if event.name == 'enter':
+            send()
+        elif event.name == "space":
+            cur.append(" ")
+        elif event.name == "backspace":
+            pass
+        else:
+            cur.append(event.name)
+
+async def send():
     url = "https://famous-parrots-remain.loca.lt"
-    while True:
-        userInput = input("Enter num: ")
-        payload = {"number": int(userInput)}
-        await sendNum(userInput, url, payload)
+    userInput = "".join(cur)
+    payload = {"number": userInput}
+    await sendNum(userInput, url, payload)
+
+def main():
+    keyboard.hook(on_key_event)
 
 if __name__ == "__main__":
     asyncio.run(main())
