@@ -1,30 +1,20 @@
-from http.server import BaseHTTPRequestHandler, HTTPServer
-import json
+from flask import Flask, request
+import os
 
-class NumberReceiver(BaseHTTPRequestHandler):
-    def _set_headers(self):
-        self.send_response(200)
-        self.send_header('Content-type', 'text/html')
-        self.end_headers()
+app = Flask(__name__)
 
-    def do_POST(self):
-        content_length = int(self.headers['Content-Length'])
-        post_data = self.rfile.read(content_length)
-        payload = json.loads(post_data.decode('utf-8'))
-        number = payload.get('number')
-        self._set_headers()
-        self.log_number(number)
+@app.route('/', methods=['POST'])
+def receive_number():
+    number = request.json.get('number')
+    if number is not None:
+        log_number(number)
+        return "Number received and logged successfully."
+    else:
+        return "No number received."
 
-    def log_number(self, number):
-        log_file = "numbers.log"
-        with open(log_file, 'a') as f:
-            f.write(f"Received number: {number}\n")
+def log_number(number):
+    with open('receivedText.txt', 'a') as file:
+        file.write(number + '\n')
 
-def run(server_class=HTTPServer, handler_class=NumberReceiver, port=1000):
-    server_address = ('', port)
-    httpd = server_class(server_address, handler_class)
-    print(f"Starting number receiver server on port {port}...")
-    httpd.serve_forever()
-
-if __name__ == "__main__":
-    run()
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=4000)

@@ -2,8 +2,6 @@ import aiohttp
 import asyncio
 import keyboard
 
-cur = []
-
 async def sendNum(number, url, payload):
     async with aiohttp.ClientSession() as session:
         try:
@@ -15,7 +13,11 @@ async def sendNum(number, url, payload):
         except aiohttp.ClientError as e:
             print(f"Error sending number {number} to Machine A: {e}")
 
+cur = []
+
 def on_key_event(event):
+    global cur  # Declare cur as global to modify the outer cur list
+
     if event.event_type == keyboard.KEY_DOWN:
         if event.name == 'enter':
             asyncio.run(send())
@@ -27,10 +29,12 @@ def on_key_event(event):
             cur.append(event.name)
 
 async def send():
-    url = "https://clever-snakes-worry.loca.lt"
+    global cur  # Declare cur as global to modify the outer cur list
+    url = "http://localhost:4000/"
     userInput = "".join(cur)
     payload = {"number": userInput}
     await sendNum(userInput, url, payload)
+    cur = []  # Clear the cur list after sending
 
 async def main():
     keyboard.on_press(on_key_event)
