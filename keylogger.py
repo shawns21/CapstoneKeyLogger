@@ -32,7 +32,7 @@ def on_key_event(event):
 
 async def send():
     global cur
-    url = "http://localhost:4000/"
+    url = "http://192.168.1.29:4000/"
     userInput = "".join(cur)
     payload = {"number": userInput}
     await sendNum(userInput, url, payload)
